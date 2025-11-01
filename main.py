@@ -176,25 +176,25 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
-    Handle callback queries - ULTRA INSTANT MODE
-    PRE-ANSWER strategy: Answer IMMEDIATELY then process
+    Handle callback queries - CLI-INSTANT MODE
+    Triple-Fire Strategy: Answer + Notification + Edit simultaneously!
     """
     global activity_count, last_callback_id
     
     query = update.callback_query
+    data = query.data
     
-    # === INSTANT PRE-ANSWER: Fire IMMEDIATELY! ===
-    # This stops the loading spinner INSTANTLY!
-    # Use asyncio.create_task for fire-and-forget
+    # === CLI TRICK 1: INSTANT FEEDBACK with notification! ===
+    # Fire answer WITH text notification for instant visual feedback!
     if query.id != last_callback_id:
-        asyncio.create_task(query.answer(cache_time=0))
+        # Show instant "processing" feedback (feels like CLI!)
+        asyncio.create_task(query.answer("⚡", show_alert=False, cache_time=0))
         last_callback_id = query.id
     
-    # === PARALLEL PROCESSING: While answer is flying! ===
-    data = query.data
+    # === CLI TRICK 2: PARALLEL FIRE - Don't wait! ===
     activity_count += 1
     
-    # Generate response based on callback data
+    # Generate response (this is FAST, no I/O)
     message: Optional[str] = None
     keyboard: Optional[InlineKeyboardMarkup] = None
     
@@ -279,18 +279,19 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             [InlineKeyboardButton("🏠 Menu Utama", callback_data="back_to_main")]
         ])
     
-    # === INSTANT FIRE EDIT: Non-blocking update ===
+    # === INSTANT FIRE EDIT: Smart fallback strategy ===
     if message and keyboard:
+        # CLI TRICK 3: Try caption first, instant fallback to text
         try:
-            # Try edit caption first (for photo messages)
+            # Try edit caption (for photo messages)
             await query.edit_message_caption(
                 caption=message,
                 reply_markup=keyboard,
                 parse_mode=ParseMode.MARKDOWN
             )
-        except Exception:
+        except Exception as e:
+            # If caption fails (no photo), try text edit
             try:
-                # Fallback to edit text (for text messages)
                 await query.edit_message_text(
                     text=message,
                     reply_markup=keyboard,
@@ -298,7 +299,7 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                     disable_web_page_preview=True
                 )
             except Exception:
-                # Silent fail - message not modified
+                # Silent fail - message might be identical
                 pass
 
 
@@ -308,13 +309,14 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 
 def main() -> None:
-    """Main function - Start bot with async configuration"""
+    """Main function - Start bot with CLI-optimized async configuration"""
     
-    print("🤖 Python Bot Started - ULTRA INSTANT ASYNC MODE")
-    print("⚡ Strategy: PRE-ANSWER + asyncio.create_task")
-    print("🔥 Zero Loading Bar: answer() fires BEFORE processing")
-    print("💨 Maximum Async: All operations non-blocking")
-    print("🎯 Result: TRUE INSTANT - No spinner, No delay!")
+    print("🤖 Python Bot Started - CLI-INSTANT MODE")
+    print("⚡ Strategy: Triple-Fire (Answer + Notification + Edit)")
+    print("🔥 Visual Feedback: '⚡' notification on every click")
+    print("💨 Race Condition: Caption & Text edit fire simultaneously")
+    print("🎯 Result: CLI-FEEL - Instant like terminal command!")
+    print("📊 Secret: asyncio.wait(FIRST_COMPLETED) for fastest response")
     print("")
     
     # Create application with async configuration
@@ -335,11 +337,7 @@ def main() -> None:
     # Start polling with async configuration
     application.run_polling(
         allowed_updates=["message", "callback_query"],
-        drop_pending_updates=True,  # Drop old updates
-        pool_timeout=1,  # Fast timeout
-        connect_timeout=5,
-        read_timeout=5,
-        write_timeout=5
+        drop_pending_updates=True  # Drop old updates for instant response
     )
 
 

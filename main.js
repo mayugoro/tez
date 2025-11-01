@@ -239,8 +239,8 @@ bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const userName = msg.from.first_name || 'User';
     
-    // Log activity
-    logActivity('MESSAGE', `/start from ${userName} (${chatId})`);
+    // Track activity (inline, no function call)
+    activityCount++; lastActivity = Date.now();
     
     const { message, keyboard } = generateMainMenu(chatId);
     
@@ -269,19 +269,35 @@ bot.onText(/\/start/, (msg) => {
     }
 });
 
-// Callback handler - 0ms INSTANT MODE (All in one tick!)
+// PRE-ANSWER CACHE: Define BEFORE listeners!
+let lastCallbackId = '';
+
+// CLI-INSTANT INTERCEPTOR: Answer with visual feedback!
+// This fires FIRST before any processing!
 bot.on('callback_query', (q) => {
-    // === 0ms: EVERYTHING FIRES AT ONCE! ===
-    // No variable assignment, direct access only!
+    // CLI TRICK: Answer with "⚡" text for instant visual feedback!
+    // User sees lightning bolt popup immediately = feels like CLI response!
+    if (q.id !== lastCallbackId) {
+        bot.answerCallbackQuery(q.id, { 
+            text: '⚡',  // Instant visual feedback!
+            show_alert: false,
+            cache_time: 0 
+        });
+        lastCallbackId = q.id;
+    }
+});
+
+// Callback handler - CLI-OPTIMIZED PROCESSING
+bot.on('callback_query', (q) => {
+    // === SKIP ANSWER: Already handled by CLI interceptor above! ===
     
-    // FIRE 1: Answer (stops spinner)
-    bot.answerCallbackQuery(q.id, { cache_time: 0 });
+    // === CLI-STYLE INSTANT EXTRACT ===
+    const d = q.data, m = q.message, c = m.chat.id, mid = m.message_id;
     
-    // FIRE 2: Track (inline, no overhead)
+    // Track (inline)
     activityCount++; lastActivity = Date.now();
     
-    // FIRE 3: Generate & Edit (one-liner chain!)
-    const d = q.data, m = q.message, c = m.chat.id, mid = m.message_id;
+    // === INSTANT GENERATE & FIRE ===
     let r;
     
     // === ULTRA-COMPACT ROUTING (No function calls, inline everything!) ===
@@ -359,9 +375,10 @@ bot.on('callback_query', () => {
 // Silent monitoring - no console spam
 // Activity counter tetap jalan di background tanpa log
 
-console.log('🤖 Bot Started - 0ms INSTANT MODE');
+console.log('🤖 Bot Started - CLI-INSTANT MODE');
 console.log('⚡ Polling: 1ms | Timeout: 1ms');
-console.log('🔥 ALL IN ONE TICK: Answer + Generate + Edit = 0ms!');
-console.log('💨 Ultra-compact: No variables, direct fire!');
-console.log('🎯 Result: TRUE INSTANT - No delay at all!');
+console.log('🔥 CLI TRICK: "⚡" notification on every click!');
+console.log('💨 Visual Feedback: Instant popup like terminal response');
+console.log('🎯 Result: Feels like CLI command execution!');
+console.log('📊 User sees feedback BEFORE content changes');
 console.log('');
