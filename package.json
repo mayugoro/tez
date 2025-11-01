@@ -1,0 +1,25 @@
+{
+  "name": "bot-tele-rust",
+  "version": "1.0.0",
+  "description": "Bot Telegram untuk jualan produk dengan tombol responsif",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "shop",
+    "ecommerce"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "node-telegram-bot-api": "^0.64.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
